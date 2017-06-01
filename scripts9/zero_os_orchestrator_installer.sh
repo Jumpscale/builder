@@ -102,7 +102,7 @@ valid
 echo "Starting orchestrator api server"
 ZEROTIERIP=`docker exec -t js9 bash -c "ip -4 addr show zt0 | grep -oP 'inet\s\d+(\.\d+){3}' | sed 's/inet //' | tr -d '\n\r'"`
 if ! docker exec -t js9 cat /root/init-include.sh | grep -q "/root/orchestratorapiserver"; then
-  docker exec -t js9 bash -c 'nohup /root/orchestratorapiserver --bind '"${ZEROTIERIP}"':8080 --ays-url http://127.0.0.1:5000 --ays-repo orchestrator-server'
+  docker exec -t js9 bash -c 'nohup /root/orchestratorapiserver --bind '"${ZEROTIERIP}"':8080 --ays-url http://127.0.0.1:5000 --ays-repo orchestrator-server&'
   docker exec -t js9 bash -c 'echo "nohup /root/orchestratorapiserver --bind '"${ZEROTIERIP}"':8080 --ays-url http://127.0.0.1:5000 --ays-repo orchestrator-server > /var/log/orchestratorapiserver.log 2>&1 &"  >> /root/init-include.sh' > /tmp/lastcommandoutput.txt 2>&1
   valid
 fi
