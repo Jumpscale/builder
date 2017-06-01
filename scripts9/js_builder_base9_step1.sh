@@ -19,6 +19,7 @@ docker run \
       --hostname "${iname}" \
       -d --device=/dev/net/tun \
       --cap-add=NET_ADMIN --cap-add=SYS_ADMIN \
+      --cap-add=DAC_OVERRIDE --cap-add=DAC_READ_SEARCH \
       -v ${GIGDIR}/:/root/gig/ \
       -v ${GIGDIR}/code/:/opt/code/ \
       phusion/baseimage > ${logfile}
