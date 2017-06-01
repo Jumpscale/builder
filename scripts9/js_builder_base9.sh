@@ -24,7 +24,7 @@ while getopts ":lph" opt; do
    l )  echo "* Will install js9 libs." ; install_libs=1 ;;
    p )  echo "* Will install js9 portal." ; install_portal=1 ;;
    h )  usage ; exit 0 ;;
-   \?)  usage exit0 ;;
+   \?)  usage ; exit 1 ;;
    esac
 done
 
@@ -39,15 +39,11 @@ if ! docker images | grep -q "jumpscale/$bname"; then
     sh js_builder_base9_step1.sh
 fi
 
-trap - ERR
-set +e
-docker inspect $iname >  /dev/null 2>&1 &&  docker rm  -f $iname > /dev/null 2>&1
-docker  inspect js9devel >  /dev/null 2>&1  &&  docker rm  -f js9deve > /dev/null 2>&1
-docker inspect js9 > /dev/null 2>&1 &&  docker rm  -f js9 > /dev/null 2>&1
-trap valid ERR
-set -e
+docker inspect $iname   > /dev/null 2>&1 && docker rm -f $iname > /dev/null
+docker inspect js9devel > /dev/null 2>&1 && docker rm -f js9deve > /dev/null
+docker inspect js9      > /dev/null 2>&1 && docker rm -f js9 > /dev/null
 
-#make sure we always install jumpscale if any of the libs are asked for
+# make sure we always install jumpscale if any of the libs are asked for
 if [ -n "$install_libs" ]; then
     install_js=1
     initenv=1
