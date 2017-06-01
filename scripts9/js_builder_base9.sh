@@ -1,12 +1,16 @@
 #!/bin/bash
 
+if [ -z ${JSENV+x} ]; then
+    echo "[-] JSENV is not set, your environment is not loaded correctly."
+    exit 1
+fi
 # progname=$0
 #see http://floppsie.comp.glam.ac.uk/Glamorgan/gaius/scripting/4.html
 
 source ~/.jsenv.sh
 source $CODEDIR/github/jumpscale/core9/cmds/js9_base
 
-function usage () {
+usage() {
    cat <<EOF
 Usage: js9_build [-l] [-p] [-h]
    -l: means install the jumpscale libs, ays & prefab
