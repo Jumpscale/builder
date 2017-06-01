@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 
 # ==================================================
 # Main Jumpscale Developer environment file
@@ -23,6 +22,11 @@ set -e
 # - check for ssh keys
 # - improve me please.
 #
+
+# Settings JSENV to some version number
+# This version is not relevant, don't trust on it
+# This is mainly to set the variable to enable JSENV settings
+export JSENV="1.0"
 
 #
 # OS Detection
