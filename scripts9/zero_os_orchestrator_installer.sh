@@ -44,16 +44,14 @@ else
 fi
 
 echo "Installing orchestrator dependencies"
-# docker exec -t js9 bash -c "pip3 install git+https://github.com/zero-os/0-core.git@${BRANCH}#subdirectory=client/py-client -U" > /tmp/lastcommandoutput.txt 2>&1
-# valid
-# docker exec -t js9 bash -c "pip3 install git+https://github.com/zero-os/0-orchestrator.git@${BRANCH}#subdirectory=pyclient -U" > /tmp/lastcommandoutput.txt 2>&1
-# valid
-# docker exec -t js9 bash -c "pip3 install zerotier -U" > /tmp/lastcommandoutput.txt 2>&1
-# valid
-# docker exec -t js9 python3 -c "from js9 import j; j.tools.prefab.local.development.golang.install()" > /tmp/lastcommandoutput.txt 2>&1
-# valid
-# docker exec -t js9 mkdir -p /usr/local/go > /tmp/lastcommandoutput.txt 2>&1
-# valid
+docker exec -t js9 bash -c "pip3 install git+https://github.com/zero-os/0-core.git@${BRANCH}#subdirectory=client/py-client -U" > /tmp/lastcommandoutput.txt 2>&1
+valid
+docker exec -t js9 bash -c "pip3 install git+https://github.com/zero-os/0-orchestrator.git@${BRANCH}#subdirectory=pyclient -U" > /tmp/lastcommandoutput.txt 2>&1
+valid
+docker exec -t js9 python3 -c "from js9 import j; j.tools.prefab.local.development.golang.install()" > /tmp/lastcommandoutput.txt 2>&1
+valid
+docker exec -t js9 mkdir -p /usr/local/go > /tmp/lastcommandoutput.txt 2>&1
+valid
 
 echo "Updating AYS orchestrator server"
 pushd ${GIGHOME}/code/github/ > /tmp/lastcommandoutput.txt 2>&1
@@ -73,7 +71,20 @@ valid
 git checkout ${BRANCH} > /tmp/lastcommandoutput.txt 2>&1
 valid
 
+if [ ! -d "0-core" ]; then
+  git clone https://github.com/zero-os/0-core.git > /tmp/lastcommandoutput.txt 2>&1
+  valid
+fi
+pushd 0-core > /tmp/lastcommandoutput.txt 2>&1
+valid
+git pull
+valid
+git checkout ${BRANCH} > /tmp/lastcommandoutput.txt 2>&1
+valid
+
 if ! docker exec -t js9 cat /root/init-include.sh | grep -q "ays start"; then
+  docker exec -t js9 bash -c "export LC_ALL=en_US.UTF-8 && export LANG=en_US.UTF-8 && ays start" > /tmp/lastcommandoutput.txt 2>&1
+  valid
   docker exec -t js9 bash -c "echo ays start >> /root/init-include.sh" > /tmp/lastcommandoutput.txt 2>&1
   valid
 fi
@@ -85,22 +96,17 @@ docker exec -t js9 bash -c "if [ ! -d /opt/go/proj/src/github.com/zero-os ]; the
 valid
 docker exec -t js9 bash -c "cd /opt/go/proj/src/github.com/zero-os/0-orchestrator/api; GOPATH=/opt/go/proj GOROOT=/opt/go/root/ /opt/go/root/bin/go get -d ./...; GOPATH=/opt/go/proj GOROOT=/opt/go/root/ /opt/go/root/bin/go build -o /root/orchestratorapiserver" > /tmp/lastcommandoutput.txt 2>&1
 valid
-docker exec -t js9 bash -c "if [ ! -d /optvar/cockpit_repos/ ]; then ays repo create -n orchestrator-server -g js9; fi" > /tmp/lastcommandoutput.txt 2>&1
+docker exec -t js9 bash -c "if [ ! -d /optvar/cockpit_repos/orchestrator-server ]; then ays repo create -n orchestrator-server -g js9; fi" > /tmp/lastcommandoutput.txt 2>&1
 valid
 
 echo "Starting orchestrator api server"
 ZEROTIERIP=`docker exec -t js9 bash -c "ip -4 addr show zt0 | grep -oP 'inet\s\d+(\.\d+){3}' | sed 's/inet //' | tr -d '\n\r'"`
 if ! docker exec -t js9 cat /root/init-include.sh | grep -q "/root/orchestratorapiserver"; then
+  docker exec -t js9 bash -c 'nohup /root/orchestratorapiserver --bind '"${ZEROTIERIP}"':8080 --ays-url http://127.0.0.1:5000 --ays-repo orchestrator-server'
   docker exec -t js9 bash -c 'echo "nohup /root/orchestratorapiserver --bind '"${ZEROTIERIP}"':8080 --ays-url http://127.0.0.1:5000 --ays-repo orchestrator-server > /var/log/orchestratorapiserver.log 2>&1 &"  >> /root/init-include.sh' > /tmp/lastcommandoutput.txt 2>&1
   valid
 fi
-# docker stop js9 > /tmp/lastcommandoutput.txt 2>&1
-# valid
-# docker start js9  > /tmp/lastcommandoutput.txt 2>&1
-# valid
 
-# echo "Waiting for api server to be ready"
-# docker exec -t js9 bash -c "while true; do if [ -d /optvar/cockpit_repos/orchestrator-server ]; then break; fi; sleep 1; done"
 echo "Deploying bootstrap service"
 docker exec -t js9 bash -c 'echo -e "bootstrap.g8os__grid1:\n  zerotierNetID: '"${ZEROTIERNWID}"'\n  zerotierToken: '"${ZEROTIERTOKEN}"'\n\nactions:\n  - action: install\n" > /optvar/cockpit_repos/orchestrator-server/blueprints/bootstrap.bp'
 docker exec -t js9 bash -c 'cd /optvar/cockpit_repos/orchestrator-server; ays blueprint' > /tmp/lastcommandoutput.txt 2>&1
@@ -108,7 +114,6 @@ valid
 docker exec -t js9 bash -c 'cd /optvar/cockpit_repos/orchestrator-server; ays run create --follow -y' > /tmp/lastcommandoutput.txt 2>&1
 valid
 
-echo
 echo "Your ays server is ready to bootstrap nodes into your zerotier network."
 echo "Download your ipxe boot iso image https://bootstrap.gig.tech/iso/${BRANCH}/${ZEROTIERNWID} and boot up your nodes!"
 echo "Enjoy your orchestrator api server: http://${ZEROTIERIP}:8080/"
