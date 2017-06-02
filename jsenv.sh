@@ -97,4 +97,8 @@ if [[ "$PS1" != *"gig"* ]]; then
     export PS1="(gig) $PS1"
 fi
 
+if [[ "$PATH" != *"cmds_host"* ]]; then
+    export PATH="${PATH}:$CODEDIR/github/jumpscale/developer/cmds_host"
+fi
+
 # set +ex

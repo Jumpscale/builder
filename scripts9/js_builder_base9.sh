@@ -92,7 +92,7 @@ done
 ssh-keyscan -p 2222 localhost 2>&1 | grep -v '^#' >> ~/.ssh/known_hosts
 
 # Adding github known_host
-container "ssh-keyscan git@github.com >> ~/.ssh/known_hosts"
+container "ssh-keyscan github.com >> ~/.ssh/known_hosts"
 
 echo "[+] loading or updating jumpscale source code"
 getcode core9 > ${logfile} 2>&1
