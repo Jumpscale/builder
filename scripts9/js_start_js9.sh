@@ -90,5 +90,4 @@ fi
 
 echo "[+] docker started"
 echo "[+] please access over ssh using:"
-echo "[+]    ssh -tA root@localhost -p ${port})"
-echo "[+] or using  js  or  jshell"
+echo "[+]    ssh -tA root@localhost -p ${port}"
