@@ -28,6 +28,7 @@ EOF
 }
 
 port=2222
+pulled=0
 
 while getopts ":npbh" opt; do
    case $opt in
@@ -46,6 +47,8 @@ docker inspect $iname >  /dev/null 2>&1 &&  docker rm  -f "$iname" > /dev/null 2
 if ! docker images | grep -q "jumpscale/$bname"; then
     if [ -n "${build}" ]; then
         bash js_builder_base9.sh -l
+    else
+        pulled=1
     fi
 fi
 echo "[+] starting jumpscale9 development environment"
@@ -62,7 +65,15 @@ docker run --name $iname \
     -v ${GIGDIR}/code/:/opt/code/ \
     jumpscale/$bname > ${logfile} 2>&1 || die "docker could not start, please check ${logfile}"
 
-# initssh
+if [ $pulled -eq 1 ]; then
+    # if we are here, this mean that:
+    # - base image was not found on local system
+    # - build argument was not specified
+    # - when docker runs, it pull'd the image from internet
+    # we need to adapt this public image now
+    ssh_authorize "${iname}"
+fi
+
 # copyfiles
 # linkcmds
 

@@ -91,6 +91,8 @@ fi
 export GIGDIR="${GIGDIR}"
 export CODEDIR="${GIGDIR}/code"
 
+# export GIGGROUP="getent group gig | cut -d: -f3"
+
 if [[ "$PS1" != *"gig"* ]]; then
     export PS1="(gig) $PS1"
 fi

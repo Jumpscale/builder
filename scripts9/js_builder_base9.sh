@@ -76,9 +76,7 @@ docker run \
     -v ${GIGDIR}/code/:/opt/code/ \
     jumpscale/$bname > ${logfile} 2>&1
 
-echo "[+] authorizing local ssh keys"
-SSHKEYS=$(ssh-add -L)
-docker exec -t $iname /bin/sh -c "echo \"${SSHKEYS}\" > /root/.ssh/authorized_keys"
+ssh_authorize $iname
 
 # Removing previous known_hosts for this target
 # and allowing the new one

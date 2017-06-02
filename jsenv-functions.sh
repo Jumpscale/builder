@@ -23,3 +23,14 @@ die() {
     echo "[-] something went wrong: $1"
     exit 1
 }
+
+ssh_authorize() {
+    if [ "$1" = "" ]; then
+        echo "[-] ssh_authorize: missing container target"
+        return
+    fi
+
+    echo "[+] authorizing local ssh keys on docker: $1"
+    SSHKEYS=$(ssh-add -L)
+    docker exec -t "$1" /bin/sh -c "echo \"${SSHKEYS}\" > /root/.ssh/authorized_keys"
+}
