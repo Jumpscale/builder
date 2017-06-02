@@ -18,3 +18,8 @@ getcode() {
         git clone git@github.com:Jumpscale/$1.git || git clone https://github.com/Jumpscale/$1.git
     fi
 }
+
+die() {
+    echo "[-] something went wrong: $1"
+    exit 1
+}

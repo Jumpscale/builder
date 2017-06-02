@@ -120,7 +120,6 @@ if [ -n "$initenv" ]; then
     container "js9_init"
 fi
 
-# cleanup
-# commitdocker
+docker commit $iname jumpscale/$iname > ${logfile} 2>&1
 
 echo "[+] build successful"

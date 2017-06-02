@@ -31,6 +31,7 @@ docker run \
 
 docker exec -t $iname bash /opt/code/github/jumpscale/developer/scripts9/js_builder_base9_step1-docker.sh
 
+echo "[+] commiting changes"
 docker commit $iname jumpscale/$iname > ${logfile} 2>&1
 docker rm -f $iname > ${logfile} 2>&1
 
