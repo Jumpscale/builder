@@ -1,44 +1,15 @@
 #!/bin/sh
 set -e
 
-clear
 if ! which curl > /dev/null; then
-  echo "curl is not installed, please install"
-  exit 1
+    echo "[-] curl not found, this is required to bootstrap jsinit"
+    exit 1
 fi
-
-valid() {
-  # EXITCODE=$?
-  # if [ ${EXITCODE} -ne 0 ]; then
-  echo "Error in line: $1"
-  cat /tmp/lastcommandoutput.txt
-  # echo $1
-  exit ${EXITCODE}
-  # fi
-}
-
-errortrapon() {
-    #make sure previous error is empty
-    echo > /tmp/lastcommandoutput.txt
-    trap 'valid $LINENO' ERR
-    set -e
-}
-
-errortrapoff() {
-    #make sure previous error is empty
-    echo > /tmp/lastcommandoutput.txt
-    trap - ERR
-    set +e
-}
-
-
-
-errortrapon
 
 osx_install() {
     if ! which brew > /dev/null; then
-      sudo echo "* Install Brew"
-      yes '' | /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+        sudo echo "* Install Brew"
+        yes '' | /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
     fi
 
     sudo echo "* Unlink curl/python/git"
@@ -82,7 +53,6 @@ alpine_install() {
     # apk add libexecinfo-dev
     # apk add linux-headers
     # apk add redis
-
 }
 
 ubuntu_install() {
@@ -190,104 +160,115 @@ getcode() {
     fi
 }
 
+main() {
+    echo "=========================="
+    echo "== jsinit bootstrapping =="
+    echo "=========================="
+    echo ""
 
-########MAIN BLOCK#############
-errortrapon
+    echo "[+] fetching our cutie mascot"
+    curl -s https://raw.githubusercontent.com/Jumpscale/developer/master/mascot?$RANDOM > ~/.mascot.txt
+    clear
+    cat ~/.mascot.txt
+    echo
 
-echo "* get mascot"
-curl https://raw.githubusercontent.com/Jumpscale/developer/master/mascot?$RANDOM > ~/.mascot.txt
-clear
-cat ~/.mascot.txt
-echo
+    if [ "$(uname)" = "Darwin" ]; then
+        echo "[+] apple plateform detected"
 
-if [ "$(uname)" = "Darwin" ]; then
-    # Do something under Mac OS X platform
-    echo "* INSTALL homebrew, curl, python, git"
-    export LANG=C; export LC_ALL=C
-    osx_install
+        # Do something under Mac OS X platform
+        echo "* INSTALL homebrew, curl, python, git"
+        export LANG=C; export LC_ALL=C
+        osx_install
 
-elif [ -e /etc/alpine-release ]; then
-    echo "* INSTALL curl, python, git"
-    alpine_install
+    elif [ -e /etc/alpine-release ]; then
+        echo "[+] alpine plateform detected"
+        alpine_install
 
-elif [ "$(expr substr $(uname -s) 1 5)" = "Linux" ]; then
-    echo "* INSTALL curl, python, git"
+    elif [ "$(expr substr $(uname -s) 1 5)" = "Linux" ]; then
+        echo "[+] linux plateform detected"
 
-    dist=`grep DISTRIB_ID /etc/*-release | awk -F '=' '{print $2}'`
-    if [ "$dist" = "Ubuntu" ]; then
-        ubuntu_install
+        dist=`grep DISTRIB_ID /etc/*-release | awk -F '=' '{print $2}'`
+        if [ "$dist" = "Ubuntu" ]; then
+            echo "[+] ubuntu distribution found"
+            ubuntu_install
 
-    elif which pacman > /dev/null 2>&1; then
-        archlinux_install
+        elif which pacman > /dev/null 2>&1; then
+            echo "[+] archlinux distribution found"
+            archlinux_install
 
-    elif which dnf > /dev/null 2>&1; then
-        fedora_install
+        elif which dnf > /dev/null 2>&1; then
+            echo "[+] fedora based distribution found"
+            fedora_install
 
-    else
-        echo "ONLY ARCHLINUX & UBUNTU LINUX SUPPORTED"
-        exit 1
+        else
+            echo "[-] sorry, your distribution is not supported"
+            exit 1
+        fi
+
+    elif [ "$(expr substr $(uname -s) 1 9)" = "CYGWIN_NT" ]; then
+        echo "[+] cygwin based system found"
+        cygwin_install
     fi
 
-elif [ "$(expr substr $(uname -s) 1 9)" = "CYGWIN_NT" ]; then
-    cygwin_install
-fi
-
-echo "* get gig environment script"
-curl https://raw.githubusercontent.com/Jumpscale/developer/master/jsenv.sh?$RANDOM > ~/.jsenv.sh
+    echo "[+] downloading generic environment file"
+    curl -s https://raw.githubusercontent.com/Jumpscale/developer/master/jsenv.sh?$RANDOM > ~/.jsenv.sh
 
 
-echo "* include the gig environment script"
-. ~/.jsenv.sh
-#THIS GIVES GIG & CODEDIR
-errortrapon
+    echo "[+] loading gig environment file"
+    . ~/.jsenv.sh
 
-#check profile file exists, if yes modify
-if [ ! -e $HOMEDIR/.bash_profile ] ; then
-    touch $HOMEDIR/.bash_profile
-else
-    #make a 1time backup
-    if [ ! -e "$HOMEDIR/.bash_profile.bak" ]; then
-        cp $HOMEDIR/.bash_profile  $HOMEDIR/.bash_profile.bak
+    # You can avoid .bash_profile smashing by setting
+    # GIGSAFE environment variable
+    if [ ! -z ${GIGSAFE+x} ]; then
+        # check profile file exists, if yes modify
+        if [ ! -e $HOMEDIR/.bash_profile ] ; then
+            touch $HOMEDIR/.bash_profile
+        else
+            #make a 1-time backup
+            if [ ! -e "$HOMEDIR/.bash_profile.bak" ]; then
+                cp $HOMEDIR/.bash_profile  $HOMEDIR/.bash_profile.bak
+            fi
+        fi
+
+        sed -i.bak '/export SSHKEYNAME/d' $HOMEDIR/.bash_profile
+        sed -i.bak '/jsenv.sh/d' $HOMEDIR/.bash_profile
+
+        echo "" >> $HOMEDIR/.bash_profile
+        echo "# Added by jsinit script" >> $HOMEDIR/.bash_profile
+        echo "export SSHKEYNAME=$SSHKEYNAME" >> $HOMEDIR/.bash_profile
+        echo "source ~/.jsenv.sh" >> $HOMEDIR/.bash_profile
     fi
-fi
-
-sed  '/export SSHKEYNAME/d'  $HOMEDIR/.bash_profile > $HOMEDIR/.bash_profile2
-mv $HOMEDIR/.bash_profile2 $HOMEDIR/.bash_profile
-sed  '/jsenv.sh/d'  $HOMEDIR/.bash_profile > $HOMEDIR/.bash_profile2
-mv $HOMEDIR/.bash_profile2 $HOMEDIR/.bash_profile
-echo export SSHKEYNAME=$SSHKEYNAME >> $HOMEDIR/.bash_profile
-echo source ~/.jsenv.sh >> $HOMEDIR/.bash_profile
 
 
-echo "* create dir's"
-export CODEDIR="$GIGDIR/code"
-mkdir -p $CODEDIR/github/jumpscale > /tmp/lastcommandoutput.txt 2>&1
+    echo "[+] creating local environment directories"
+    mkdir -p ${CODEDIR}/github/jumpscale
 
-echo "* get core code for development scripts & jumpscale core"
-getcode
+    echo "[+] installing code for development scripts and jumpscale core"
+    getcode
 
-linkcode() {
-    echo "* link commands to local environment"
-    #link all our command lines relevant to jumpscale development env
+    echo "[+] ensure local commands are callable"
+    chmod +x ${CODEDIR}/github/jumpscale/developer/cmds_host/*
+
+    echo "[+] cleaning garbage"
     rm -f /usr/local/bin/js9*
     rm -rf /usr/local/bin/cmds*
-    find  $CODEDIR/github/jumpscale/developer/cmds_host -exec chmod 770 {} \;
-    sudo find  $CODEDIR/github/jumpscale/developer/cmds_host -exec ln -s {} "/usr/local/bin/" \;
-    rm -rf /usr/local/bin/cmds_host
+
+    # create private dir
+    mkdir -p "${GIGDIR}/private"
+    if [ ! -e "$GIGDIR/private/me.toml" ]; then
+        echo "* copy templates private files."
+        cp $CODEDIR/github/jumpscale/developer/templates/private/me.toml $GIGDIR/private/
+    fi
+
+    # echo "* copy chosen sshpub key"
+    " mkdir -p $GIGDIR/private/pubsshkeys
+    " cp ~/.ssh/$SSHKEYNAME.pub $GIGDIR/private/pubsshkeys/ > /tmp/lastcommandoutput.txt 2>&1
+
+    echo "[+] please edit templates in ${GIGDIR}/private/"
+    echo "[+]    if you don't then installer will ask for it."
+    echo "[+]"
+    echo "[+] to get started with jumpscale do 'js9_start'"
+    echo "[+]     docker needs to be installed locally"
 }
 
-linkcode > /tmp/lastcommandoutput.txt 2>&1
-
-#create private dir
-mkdir -p $GIGDIR/private
-if [ ! -e "$GIGDIR/private/me.toml" ]; then
-    echo "* copy templates private files."
-    cp $CODEDIR/github/jumpscale/developer/templates/private/me.toml $GIGDIR/private/ > /tmp/lastcommandoutput.txt 2>&1
-fi
-
-echo "* copy chosen sshpub key"
-mkdir -p $GIGDIR/private/pubsshkeys
-cp ~/.ssh/$SSHKEYNAME.pub $GIGDIR/private/pubsshkeys/ > /tmp/lastcommandoutput.txt 2>&1
-
-echo "* please edit templates in $GIGDIR/private/, if you don't then installer will ask for it."
-echo "* to get started with jumpscale do 'js9_start', docker needs to be installed locally."
+main "$@"
