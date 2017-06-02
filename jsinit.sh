@@ -17,7 +17,6 @@ osx_install() {
     brew unlink curl   > /tmp/lastcommandoutput.txt 2>&1
     brew unlink python3  > /tmp/lastcommandoutput.txt 2>&1
     brew unlink git  > /tmp/lastcommandoutput.txt 2>&1
-    errortrapon
     sudo echo "* Install Python"
     brew install --overwrite python3  > /tmp/lastcommandoutput.txt 2>&1
     brew link --overwrite python3  > /tmp/lastcommandoutput.txt 2>&1
@@ -114,15 +113,12 @@ branchExists() {
 }
 
 getcode() {
-    errortrapon
     echo "* get code"
     cd $CODEDIR/github/jumpscale
 
     if ! grep -q ^github.com ~/.ssh/known_hosts 2> /dev/null; then
         ssh-keyscan github.com >> ~/.ssh/known_hosts 2>&1
     fi
-
-    export GIGBRANCH=${GIGBRANCH:-"master"}
 
     if [ ! -e $CODEDIR/github/jumpscale/developer ]; then
         repository="Jumpscale/developer"
@@ -172,6 +168,8 @@ main() {
     cat ~/.mascot.txt
     echo
 
+    export GIGBRANCH=${GIGBRANCH:-"master"}
+
     if [ "$(uname)" = "Darwin" ]; then
         echo "[+] apple plateform detected"
 
@@ -211,7 +209,7 @@ main() {
     fi
 
     echo "[+] downloading generic environment file"
-    curl -s https://raw.githubusercontent.com/Jumpscale/developer/master/jsenv.sh?$RANDOM > ~/.jsenv.sh
+    curl -s https://raw.githubusercontent.com/Jumpscale/developer/$GIGBRANCH/jsenv.sh?$RANDOM > ~/.jsenv.sh
 
 
     echo "[+] loading gig environment file"
@@ -250,8 +248,8 @@ main() {
     chmod +x ${CODEDIR}/github/jumpscale/developer/cmds_host/*
 
     echo "[+] cleaning garbage"
-    rm -f /usr/local/bin/js9*
-    rm -rf /usr/local/bin/cmds*
+    rm -f /usr/local/bin/js9* || true
+    rm -rf /usr/local/bin/cmds* || true
 
     # create private dir
     mkdir -p "${GIGDIR}/private"
@@ -260,9 +258,9 @@ main() {
         cp $CODEDIR/github/jumpscale/developer/templates/private/me.toml $GIGDIR/private/
     fi
 
-    # echo "* copy chosen sshpub key"
-    " mkdir -p $GIGDIR/private/pubsshkeys
-    " cp ~/.ssh/$SSHKEYNAME.pub $GIGDIR/private/pubsshkeys/ > /tmp/lastcommandoutput.txt 2>&1
+    echo "[+] copy chosen sshpub key"
+    mkdir -p $GIGDIR/private/pubsshkeys
+    SSHKEYS=$(ssh-add -L) > $GIGDIR/private/pubsshkeys/id_rsa.pub
 
     echo "[+] please edit templates in ${GIGDIR}/private/"
     echo "[+]    if you don't then installer will ask for it."
