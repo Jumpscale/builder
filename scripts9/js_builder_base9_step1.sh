@@ -1,6 +1,11 @@
 #!/bin/bash
 set -e
 
+if [ -z ${JSENV+x} ]; then
+    echo "[-] JSENV is not set, your environment is not loaded correctly."
+    exit 1
+fi
+
 # source ~/.jsenv.sh
 # source $CODEDIR/github/jumpscale/core9/cmds/js9_base
 

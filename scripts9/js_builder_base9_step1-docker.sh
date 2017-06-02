@@ -65,7 +65,7 @@ echo "[+]   installing jumpscale core9"
 pip3 install -e /opt/code/github/jumpscale/core9 --upgrade > ${logfile} 2>&1
 
 echo "[+]   syncronizing developer files"
-rsync -rav /opt/code/github/jumpscale/developer/files_guest/ / > ${logfile} 2>&1
+rsync -rv /opt/code/github/jumpscale/developer/files_guest/ / > ${logfile} 2>&1
 
 echo "[+]   installing binaries files"
 # source /root/.jsenv.sh
