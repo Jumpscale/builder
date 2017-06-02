@@ -21,7 +21,7 @@ By default all the code will be installed in `~/gig`, if you want to use another
 
 `export GIGDIR=/home/user/development/otherdir/gig`
 
-### Start the installation
+### Initialize the host:
 First execute `jsinit.sh` in order to prepare the installation:
 
 ```bash
@@ -29,6 +29,7 @@ export GIGBRANCH=master
 curl https://raw.githubusercontent.com/Jumpscale/developer/master/jsinit.sh?$RANDOM > /tmp/jsinit.sh; bash /tmp/jsinit.sh
 ```
 
+### Build the docker image:
 Then in order to actually install you need to execute `js9_build`:
 
 ```bash
@@ -43,6 +44,19 @@ To see interactive output do the following in a separate console:
 
 ```bash
 tail -f /tmp/install.log
+```
+
+### Start the docker
+start the developement environment build in the docker
+
+```shell
+js9_start
+```
+
+then ssh into it
+
+```sell
+ssh root@localhost -p 2222
 ```
 
 ## JumpScale 8.2
@@ -75,14 +89,8 @@ tail -f /tmp/lastcommandoutput.txt
 ```
 
 
-## Login into the development machine
+Login into the development machine
 
-JumpScale 9:
-```
-ssh root@localhost -p 2222
-```
-
-JumpScale 8.2:
 ```
 ssh root@zerotier-IP-address
 #or

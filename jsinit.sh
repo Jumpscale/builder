@@ -248,8 +248,8 @@ main() {
     chmod +x ${CODEDIR}/github/jumpscale/developer/cmds_host/*
 
     echo "[+] cleaning garbage"
-    rm -f /usr/local/bin/js9* || true
-    rm -rf /usr/local/bin/cmds* || true
+    rm -f /usr/local/bin/js9* > /dev/null 2>&1 || true
+    rm -rf /usr/local/bin/cmds* > /dev/null 2>&1 || true
 
     # create private dir
     mkdir -p "${GIGDIR}/private"
@@ -265,7 +265,7 @@ main() {
     echo "[+] please edit templates in ${GIGDIR}/private/"
     echo "[+]    if you don't then installer will ask for it."
     echo "[+]"
-    echo "[+] to get started with jumpscale do 'js9_start'"
+    echo "[+] to get started with jumpscale do 'js9_start -b'"
     echo "[+]     docker needs to be installed locally"
 }
 
