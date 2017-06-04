@@ -55,21 +55,10 @@ alpine_install() {
 }
 
 ubuntu_install() {
-    locale-gen en_US.UTF-8
+    sudo locale-gen en_US.UTF-8
     export LANG=en_US.UTF-8
     export LC_ALL=en_US.UTF-8
-
-    apt-get install curl git ssh python3 -y
-    # apt-get install python3-pip -y
-    # apt-get install libssl-dev -y
-    # apt-get install python3-dev -y
-    # apt-get install build-essential -y
-    # apt-get install libffi-dev -y
-    # apt-get install libsnappy-dev libsnappy1v5 -y
-    # rm -f /usr/bin/python
-    # rm -f /usr/bin/python3
-    # ln -s /usr/bin/python3.5 /usr/bin/python
-    # ln -s /usr/bin/python3.5 /usr/bin/python3
+    sudo apt-get install curl git ssh python3 -y
 }
 
 archlinux_install() {
@@ -77,8 +66,7 @@ archlinux_install() {
 }
 
 fedora_install() {
-   dnf install -y git curl openssh python3
-   export PATH=$PATH:/usr/local/bin
+   sudo dnf install -y git curl openssh python3
 }
 
 cygwin_install() {
