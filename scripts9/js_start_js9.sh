@@ -59,7 +59,7 @@ echo "[+] starting jumpscale9 development environment"
 docker run --name $iname \
     --hostname $iname \
     -d \
-    -p ${port}:22 -p 6600-6700:6600-6700 \
+    -p ${port}:22 -p 6601-6700:6601-6700 \
     --device=/dev/net/tun \
     --cap-add=NET_ADMIN --cap-add=SYS_ADMIN \
     --cap-add=DAC_OVERRIDE --cap-add=DAC_READ_SEARCH \
