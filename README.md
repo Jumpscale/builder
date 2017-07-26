@@ -58,7 +58,7 @@ Since Docker containers aren't supported on WSL (for now), you will need to do t
 First execute `jsinit.sh` in order to prepare the installation:
 ```bash
 export GIGDEVELOPERBRANCH="master"
-curl https://raw.githubusercontent.com/Jumpscale/developer/${GIGDEVELOPERBRANCH}/jsinit.sh?$RANDOM > /tmp/jsinit.sh
+curl "https://raw.githubusercontent.com/Jumpscale/developer/${GIGDEVELOPERBRANCH}/jsinit.sh?$RANDOM" > /tmp/jsinit.sh
 bash /tmp/jsinit.sh
 ```
 
