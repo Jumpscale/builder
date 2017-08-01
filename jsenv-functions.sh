@@ -43,9 +43,17 @@ dockerrun() {
 
     existing="$(docker ps -aq -f name=^/${iname}$)"
     mounted_volumes="\
-        -v ~/container/:/host/ \
-        -v ~/code/:/opt/code/ \
+        -v ${GIGDIR}/:/root/gig/ \
+        -v ${GIGDIR}/code/:/opt/code/ \
+        -v ${GIGDIR}/private/:/optvar/private \
     "
+    # mount optvar/data to all platforms except for windows to avoid fsync mongodb error
+    # related: https://docs.mongodb.com/manual/administration/production-notes/#fsync-on-directories
+    if [ -e /proc/version ] &&  ! grep -q Microsoft /proc/version; then
+        mounted_volumes="$mounted_volumes \
+            -v ${GIGDIR}/data/:/optvar/data \
+        "
+    fi
 
     if [[ ! -z "$existing" ]]; then
       if [ ! -z "$start" ]; then
