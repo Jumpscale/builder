@@ -33,12 +33,6 @@ If you don't want the JumpScale install script change your `bash_profile`, set t
 export GIGSAFE=1
 ```
 
-### Choose your JumpScale base directory (optional)
-By default all the code will be installed in `~/gig`, if you want to use another location, export the `GIGDIR` environment variable:
-
-```bash
-export GIGDIR=/home/user/development/otherdir/gig
-```
 
 #### Note for Windows Subsystem for Linux (WSL)
 Since Docker containers aren't supported on WSL (for now), you will need to do the following:

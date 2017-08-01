@@ -18,7 +18,6 @@
 #
 # What does this script does ?
 #
-# - sets GIGDIR
 # - check for ssh keys
 # - improve me please.
 #
@@ -35,18 +34,15 @@ if [ "$(uname)" = "Darwin" ]; then
     export LANG=C
     export LC_ALL=C
     export HOMEDIR=~
-    export GIGDIR=${GIGDIR:-~/gig}
 
 elif [ -e /proc/version ] && grep -q Microsoft /proc/version; then
     # Windows subsystem 4 linux
     WINDOWSUSERNAME=$(ls -ail /mnt/c/Users/ | grep drwxrwxrwx | grep -v Public | grep -v Default | grep -v '\.\.')
     WINDOWSUSERNAME=${WINDOWSUSERNAME##* }
-    GIGDIR=/c/Users/${WINDOWSUSERNAME}/gig
     export HOMEDIR=~
 
 else
     # Native Linux or MacOSX
-    export GIGDIR=${GIGDIR:-~/gig}
     HOMEDIR=~
 fi
 
@@ -92,12 +88,7 @@ if [ -z "$SSH_AUTH_SOCK" ]; then
     fi
 fi
 
-
-# FIXME: why is this redeclared ?
-export GIGDIR="${GIGDIR}"
-export CODEDIR="${GIGDIR}/code"
-
-# export GIGGROUP="getent group gig | cut -d: -f3"
+export CODEDIR=${CODEDIR:-~/code/}
 
 if [[ "$PS1" != *"js9"* ]]; then
     export PS1="(js9) $PS1"

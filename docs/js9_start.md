@@ -1,6 +1,6 @@
 ## Usage
 
-After finishing the building step, this command will actually start the container containing the js9 installation. To be able to use this command you need to source '.jsenv.sh' file and have your `GIGDIR` environment variable exported to the location specified in the installation.
+After finishing the building step, this command will actually start the container containing the js9 installation. 
 
 By default the created container will be called 'js9' and will use port 2222. It is possible to specify the name and the port by using the various options available to this command specified below.
 
