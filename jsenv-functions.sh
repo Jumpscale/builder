@@ -144,12 +144,18 @@ ssh_authorize() {
     fi
 
     echo "[+] authorizing local ssh keys on docker: $1"
-    SSHKEYS=$(ssh-add -L)
-    if [ -e /proc/version ] && grep -q Microsoft /proc/version; then
-        # Windows Sub Linux doesn't support escaping quote so ssh-add -L should have only one key
-        docker exec -t "$1" /bin/sh -c "echo ${SSHKEYS} >> /root/.ssh/authorized_keys"
+    ssh-add -L && key_loaded=true || key_loaded=false
+    if $key_loaded; then
+        SSHKEYS=$(ssh-add -L)
+        if [ -e /proc/version ] && grep -q Microsoft /proc/version; then
+            # Windows Sub Linux doesn't support escaping quote so ssh-add -L should have only one key
+            docker exec -t "$1" /bin/sh -c "echo ${SSHKEYS} >> /root/.ssh/authorized_keys"
+        else
+            docker exec -t "$1" /bin/sh -c "echo \"${SSHKEYS}\" >> /root/.ssh/authorized_keys"
+        fi
     else
-        docker exec -t "$1" /bin/sh -c "echo \"${SSHKEYS}\" >> /root/.ssh/authorized_keys"
+        echo "[-] Error: No SSH Keys are loaded, please make sure that you have loaded at least one ssh key into ssh agent"
+        exit 1
     fi
 }
 
