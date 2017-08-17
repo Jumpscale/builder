@@ -45,7 +45,7 @@ tail -f /tmp/lastcommandoutput.txt
 
 7 - Start the docker container for js9
 ```bash
-export $HOMEDIR=~ # Make sure that the HOMEDIR variable is exported
+export HOMEDIR=~ # Make sure that the HOMEDIR variable is exported
 js9_start
 ```
 
