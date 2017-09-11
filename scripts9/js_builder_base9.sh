@@ -60,6 +60,7 @@ base_deps() {
     echo "[+]   setting up default environment"
     container 'echo "" > /etc/motd'
     container touch /root/.iscontainer
+    container mkdir /host
     echo "[+]   base deps done"
 
 }
@@ -126,7 +127,6 @@ installjs9() {
     container rm -rf /usr/local/bin/cmds_guest
 
     echo "[+]   initializing jumpscale part3"
-    container 'python3 -c "from JumpScale9 import j; j.do.initEnv()"'
     container 'python3 -c "from JumpScale9 import j; j.tools.jsloader.generate()"'
 
 }
