@@ -1,3 +1,12 @@
+## --- OUTDATED  PLEASE ONLY USE FOR RELEASES PRE-9.1.3 ---
+
+For 9.1.3 onwards, please use [bash](https://github.com/Jumpscale/bash) instead
+
+
+
+
+-----
+
 # Development environment
 Use this development environment to play & develop with JumpScale.
 
