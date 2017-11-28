@@ -1,5 +1,8 @@
 # Development environment
 
+** ONLY USE THIS FOR OLDER VERSIONS OF JUMPSCALE **
+
+For versions 9.1.3, 9.2.x and 9.3.x use the JumpScale bash utilities: https://github.com/Jumpscale/bash
 
 ## JumpScale 9
 
